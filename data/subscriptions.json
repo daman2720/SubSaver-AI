@@ -1,0 +1,102 @@
+[
+  {
+    "id": 1,
+    "name": "Netflix Premium",
+    "cost": 22.99,
+    "renewal_date": "2026-11-05",
+    "description": "Watch series and movies on weekends",
+    "category": "Streaming",
+    "uses_per_month": 8,
+    "category_source": "manual"
+  },
+  {
+    "id": 2,
+    "name": "Disney+",
+    "cost": 13.99,
+    "renewal_date": "2026-11-12",
+    "description": "Occasional kids movies",
+    "category": "Streaming",
+    "uses_per_month": 2,
+    "category_source": "manual"
+  },
+  {
+    "id": 3,
+    "name": "Spotify Premium",
+    "cost": 11.99,
+    "renewal_date": "2026-11-03",
+    "description": "Daily music while commuting",
+    "category": "Music",
+    "uses_per_month": 60,
+    "category_source": "manual"
+  },
+  {
+    "id": 4,
+    "name": "ChatGPT Plus",
+    "cost": 20.0,
+    "renewal_date": "2026-11-15",
+    "description": "Writing help and coding questions",
+    "category": "AI Tools",
+    "uses_per_month": 40,
+    "category_source": "manual"
+  },
+  {
+    "id": 5,
+    "name": "Claude Pro",
+    "cost": 20.0,
+    "renewal_date": "2026-11-18",
+    "description": "Coding and document analysis",
+    "category": "AI Tools",
+    "uses_per_month": 35,
+    "category_source": "manual"
+  },
+  {
+    "id": 6,
+    "name": "Google One 2TB",
+    "cost": 9.99,
+    "renewal_date": "2026-11-22",
+    "description": "Photo and file backup",
+    "category": "Cloud Storage",
+    "uses_per_month": 5,
+    "category_source": "manual"
+  },
+  {
+    "id": 7,
+    "name": "Dropbox Plus",
+    "cost": 11.99,
+    "renewal_date": "2026-11-25",
+    "description": "Sharing files with friends",
+    "category": "Cloud Storage",
+    "uses_per_month": 1,
+    "category_source": "manual"
+  },
+  {
+    "id": 8,
+    "name": "Notion Plus",
+    "cost": 10.0,
+    "renewal_date": "2026-11-08",
+    "description": "Notes and project planning",
+    "category": "Project Management",
+    "uses_per_month": 20,
+    "category_source": "manual"
+  },
+  {
+    "id": 9,
+    "name": "Trello Standard",
+    "cost": 5.0,
+    "renewal_date": "2026-11-20",
+    "description": "Simple task boards",
+    "category": "Project Management",
+    "uses_per_month": 3,
+    "category_source": "manual"
+  },
+  {
+    "id": 10,
+    "name": "chatgpt",
+    "cost": 299.0,
+    "renewal_date": "2026-11-06",
+    "description": "",
+    "category": "AI Tools",
+    "uses_per_month": 4,
+    "category_source": "manual"
+  }
+]

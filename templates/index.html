@@ -1,0 +1,160 @@
+{% extends "base.html" %}
+{% block content %}
+
+<section class="hero">
+  <span class="eyebrow">AI-powered subscription audit</span>
+  <h1>Stop paying for what <span class="grad-text">you don’t use.</span></h1>
+  <p>SubSaver finds overlapping and unused plans, suggests cheaper options, and lets you approve every change.</p>
+  <div class="hero-actions">
+    <a class="btn btn-glow" href="{{ url_for('recommendations') }}">Find my savings →</a>
+    <a class="btn btn-ghost" href="{{ url_for('report') }}">View report</a>
+  </div>
+</section>
+
+{% if summary.pending_count %}
+<div class="alert-banner mb-4">
+  <span><strong>{{ summary.pending_count }} saving opportunities</strong> found. You could save up to
+    <strong>{{ currency }}{{ "%.2f"|format(summary.potential_monthly) }}</strong> per month.</span>
+  <a href="{{ url_for('recommendations') }}" class="btn btn-glow btn-sm">Review</a>
+</div>
+{% endif %}
+
+<div class="row g-3 mb-4">
+  <div class="col-6 col-lg-3"><div class="stat-card h-100">
+    <span class="stat-icon"></span><span class="label">Monthly spend</span>
+    <h2>{{ currency }}{{ "%.2f"|format(total) }}</h2></div></div>
+  <div class="col-6 col-lg-3"><div class="stat-card h-100">
+    <span class="stat-icon"></span><span class="label">Possible savings / month</span>
+    <h2>{{ currency }}{{ "%.2f"|format(summary.potential_monthly) }}</h2></div></div>
+  <div class="col-6 col-lg-3"><div class="stat-card h-100">
+    <span class="stat-icon"></span><span class="label">Yearly spend</span>
+    <h2>{{ currency }}{{ "%.2f"|format(yearly) }}</h2></div></div>
+  <div class="col-6 col-lg-3"><div class="stat-card h-100">
+    <span class="stat-icon"></span><span class="label">Subscriptions</span>
+    <h2>{{ subs|length }}</h2></div></div>
+</div>
+
+<div class="row g-4">
+  <!-- LEFT: add form -->
+  <div class="col-lg-4">
+    <div class="glass-card">
+      <h5 class="mb-3">Add subscription</h5>
+      <form method="post" action="{{ url_for('add') }}">
+        <label class="form-label">Service name</label>
+        <input class="form-control mb-2" name="name" required placeholder="e.g. Hotstar">
+
+        <div class="row g-2">
+          <div class="col-6">
+            <label class="form-label">Monthly cost</label>
+            <input class="form-control mb-2" type="number" step="0.01" min="0" name="cost" required>
+          </div>
+          <div class="col-6">
+            <label class="form-label">Uses / month</label>
+            <input class="form-control mb-2" type="number" min="0" name="uses_per_month" value="0">
+          </div>
+        </div>
+
+        <label class="form-label">Renewal date</label>
+        <input class="form-control mb-2" type="date" name="renewal_date">
+
+        <label class="form-label">Category</label>
+        <select class="form-select mb-2" name="category">
+          <option value="auto">✦ Auto (AI decides)</option>
+          {% for c in categories %}<option value="{{ c }}">{{ c }}</option>{% endfor %}
+        </select>
+
+        <label class="form-label">How do you use it?</label>
+        <textarea class="form-control mb-3" name="description" rows="2"
+                  placeholder="e.g. Watch cricket matches"></textarea>
+
+        <button class="btn btn-glow w-100">Add subscription</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- RIGHT: table + charts -->
+  <div class="col-lg-8">
+    <div class="glass-card mb-4">
+      <h5 class="mb-3">Your subscriptions</h5>
+      <div class="table-responsive">
+        <table class="table align-middle">
+          <thead><tr><th>Service</th><th>Category</th><th>Cost</th><th>Renews</th><th>Uses</th><th></th></tr></thead>
+          <tbody>
+          {% for s in subs %}
+            <tr>
+              <td><strong>{{ s.name }}</strong><div class="small text-muted">{{ s.description }}</div></td>
+              <td>
+                <span class="badge badge-cat cat-{{ s.category|lower|replace(' ', '-') }}">{{ s.category }}</span>
+                {% if s.category_source == 'ai' %}<span class="badge badge-ai">AI</span>
+                {% elif s.category_source == 'rules' %}<span class="small text-muted">rules</span>{% endif %}
+              </td>
+              <td><strong>{{ currency }}{{ "%.2f"|format(s.cost) }}</strong></td>
+              <td>{{ s.renewal_date }}</td>
+              <td>{{ s.uses_per_month }}</td>
+              <td>
+                <form method="post" action="{{ url_for('delete', sub_id=s.id) }}"
+                      onsubmit="return confirm('Delete this subscription?')">
+                  <button class="btn btn-sm btn-outline-danger">✕</button>
+                </form>
+              </td>
+            </tr>
+          {% else %}
+            <tr><td colspan="6" class="text-muted">No subscriptions yet.</td></tr>
+          {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="row g-4">
+      <div class="col-md-6">
+        <div class="glass-card h-100">
+          <h5 class="mb-2">Spend by category</h5>
+          {% for cat, amt in by_cat.items() %}
+            <div class="cat-row cat-{{ cat|lower|replace(' ', '-') }}">
+              <div class="d-flex justify-content-between small">
+                <span>{{ cat }}</span><strong>{{ currency }}{{ "%.2f"|format(amt) }}</strong>
+              </div>
+              <div class="bar"><div class="bar-fill" style="width: {{ (amt / total * 100) if total else 0 }}%"></div></div>
+            </div>
+          {% endfor %}
+        </div>
+      </div>
+      <div class="col-md-6">
+        <div class="glass-card h-100">
+          <h5 class="mb-2">Where your money goes</h5>
+          <div class="chart-sm"><canvas id="catChart"></canvas></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js"></script>
+<script>
+  const spend = {{ by_cat|tojson }};
+  const palette = {
+    "Streaming": "#f472b6", "Music": "#fbbf24", "AI Tools": "#22d3ee",
+    "Cloud Storage": "#60a5fa", "Project Management": "#34d399", "Design": "#fb923c",
+    "Education": "#a3e635", "Fitness": "#2dd4bf", "Other": "#94a3b8"
+  };
+  const labels = Object.keys(spend);
+  if (labels.length) {
+    new Chart(document.getElementById("catChart"), {
+      type: "doughnut",
+      data: {
+        labels: labels,
+        datasets: [{
+          data: Object.values(spend).map(v => Math.round(v * 100) / 100),
+          backgroundColor: labels.map(l => palette[l] || "#94a3b8"),
+          borderColor: "#0c111d", borderWidth: 4, hoverOffset: 8
+        }]
+      },
+      options: {
+        maintainAspectRatio: false, cutout: "68%",
+        plugins: { legend: { position: "bottom", labels: { color: "#cbd5e1", usePointStyle: true, padding: 14 } } }
+      }
+    });
+  }
+</script>
+{% endblock %}

@@ -1,0 +1,42 @@
+{
+  "netflix": [
+    {"name": "Netflix Standard with Ads", "price": 7.99, "max_usage": 40, "type": "downgrade",
+     "features": "Full catalog in 1080p", "limitations": "Contains ads; a few titles unavailable"},
+    {"name": "Netflix Standard", "price": 17.99, "max_usage": 60, "type": "downgrade",
+     "features": "Ad-free, 1080p, 2 screens", "limitations": "No 4K, fewer viewing devices"}
+  ],
+  "disney": [
+    {"name": "Disney+ Basic (with ads)", "price": 9.99, "max_usage": 15, "type": "downgrade",
+     "features": "Full library with ads", "limitations": "Ads shown; no downloads"}
+  ],
+  "spotify": [
+    {"name": "Spotify Free", "price": 0, "max_usage": 25, "type": "downgrade",
+     "features": "Full music library", "limitations": "Ads, shuffle-only on mobile, no offline listening"}
+  ],
+  "chatgpt": [
+    {"name": "ChatGPT Free", "price": 0, "max_usage": 15, "type": "downgrade",
+     "features": "Core chat and basic tools", "limitations": "Lower usage limits, slower at peak times"}
+  ],
+  "claude": [
+    {"name": "Claude Free", "price": 0, "max_usage": 15, "type": "downgrade",
+     "features": "Core chat and document help", "limitations": "Lower usage limits"}
+  ],
+  "google one": [
+    {"name": "Google One 200 GB", "price": 2.99, "max_usage": 40, "type": "downgrade",
+     "features": "200 GB shared across Google apps", "limitations": "Much less space than 2 TB"}
+  ],
+  "dropbox": [
+    {"name": "Dropbox Basic (Free)", "price": 0, "max_usage": 10, "type": "downgrade",
+     "features": "2 GB storage and file sharing", "limitations": "Small storage, limited device sync"},
+    {"name": "Google Drive (15 GB free)", "price": 0, "max_usage": 20, "type": "switch",
+     "features": "15 GB and easy sharing", "limitations": "Storage shared with Gmail and Photos"}
+  ],
+  "notion": [
+    {"name": "Notion Free", "price": 0, "max_usage": 30, "type": "downgrade",
+     "features": "Unlimited pages for personal use", "limitations": "Limited file uploads, fewer team features"}
+  ],
+  "trello": [
+    {"name": "Trello Free", "price": 0, "max_usage": 30, "type": "downgrade",
+     "features": "Unlimited cards and basic boards", "limitations": "Fewer automations and views"}
+  ]
+}

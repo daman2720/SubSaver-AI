@@ -1,0 +1,93 @@
+{% extends "base.html" %}
+{% block content %}
+
+<div class="d-flex justify-content-between align-items-center flex-wrap gap-2 my-4">
+  <div>
+    <h3 class="mb-0">Savings report</h3>
+    <span class="text-muted small">Only approved changes are counted.</span>
+  </div>
+  <a class="btn btn-glow btn-sm" href="{{ url_for('recommendations') }}">Review suggestions</a>
+</div>
+
+<div class="row g-3 mb-4">
+  <div class="col-md-3"><div class="stat-card">
+    <span class="label">Current monthly spend</span>
+    <h2>{{ currency }}{{ "%.2f"|format(summary.current_monthly) }}</h2></div></div>
+  <div class="col-md-3"><div class="stat-card">
+    <span class="label">Projected monthly spend</span>
+    <h2>{{ currency }}{{ "%.2f"|format(summary.projected_monthly) }}</h2></div></div>
+  <div class="col-md-3"><div class="stat-card">
+    <span class="label">Saved per month ({{ summary.percent_saved }}%)</span>
+    <h2>{{ currency }}{{ "%.2f"|format(summary.monthly_saved) }}</h2></div></div>
+  <div class="col-md-3"><div class="stat-card">
+    <span class="label">Saved per year</span>
+    <h2>{{ currency }}{{ "%.2f"|format(summary.yearly_saved) }}</h2></div></div>
+</div>
+
+{% if summary.pending_count %}
+<div class="alert-banner mb-4">
+  <span>{{ summary.pending_count }} suggestion(s) are still pending. Approving them could save
+    <strong>{{ currency }}{{ "%.2f"|format(summary.potential_monthly) }}</strong> more per month.</span>
+  <a href="{{ url_for('recommendations') }}" class="btn btn-glow btn-sm">Decide now</a>
+</div>
+{% endif %}
+
+<div class="glass-card mb-4">
+  <h5 class="mb-3">Spending by category: before vs after</h5>
+  <div class="chart-box"><canvas id="spendChart"></canvas></div>
+</div>
+
+<div class="glass-card mb-4">
+  <h5 class="mb-3">Approved changes</h5>
+  <div class="table-responsive">
+    <table class="table align-middle">
+      <thead><tr><th>Service</th><th>Change</th><th>Cost</th><th>Saves / month</th><th>Why</th></tr></thead>
+      <tbody>
+      {% for r in approved %}
+        <tr>
+          <td><strong>{{ r.name }}</strong></td>
+          <td>{{ r.action|capitalize }}{% if r.alt_name %}: {{ r.alt_name }}{% endif %}</td>
+          <td>{{ currency }}{{ "%.2f"|format(r.current_cost) }} → {{ currency }}{{ "%.2f"|format(r.new_cost) }}</td>
+          <td class="save-amount">{{ currency }}{{ "%.2f"|format(r.monthly_savings) }}</td>
+          <td class="small">{{ r.explanation or r.rule_reason }}</td>
+        </tr>
+      {% else %}
+        <tr><td colspan="5" class="text-muted">No approved changes yet.</td></tr>
+      {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+
+{% if rejected %}
+<div class="glass-card mb-4">
+  <h5 class="mb-3">Rejected suggestions (you chose to keep these)</h5>
+  {% for r in rejected %}
+    <div class="small text-muted">• {{ r.name }} ({{ r.action }}), would have saved {{ currency }}{{ "%.2f"|format(r.monthly_savings) }}/month</div>
+  {% endfor %}
+</div>
+{% endif %}
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js"></script>
+<script>
+  const chartData = {{ chart|tojson }};
+  new Chart(document.getElementById("spendChart"), {
+    type: "bar",
+    data: {
+      labels: chartData.labels,
+      datasets: [
+        { label: "Current spend", data: chartData.before, backgroundColor: "#fbbf24", borderRadius: 8 },
+        { label: "After approved changes", data: chartData.after, backgroundColor: "#34d399", borderRadius: 8 }
+      ]
+    },
+    options: {
+      maintainAspectRatio: false,
+      plugins: { legend: { labels: { color: "#e2e8f0" } } },
+      scales: {
+        x: { ticks: { color: "#94a3b8" }, grid: { color: "rgba(148,163,184,0.1)" } },
+        y: { beginAtZero: true, ticks: { color: "#94a3b8" }, grid: { color: "rgba(148,163,184,0.1)" } }
+      }
+    }
+  });
+</script>
+{% endblock %}
